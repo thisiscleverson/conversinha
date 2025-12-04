@@ -1,0 +1,25 @@
+meta {
+  name: send message
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:3030/api/messages
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "sender": "talles",
+    "recipient": "cleverson",
+    "title": "Hello World",
+    "content": "isto é um teste!"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

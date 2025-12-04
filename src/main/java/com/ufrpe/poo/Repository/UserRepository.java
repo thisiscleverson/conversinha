@@ -1,7 +1,7 @@
 package com.ufrpe.poo.Repository;
 
 import com.ufrpe.poo.Database.Database;
-import com.ufrpe.poo.model.User;
+import com.ufrpe.poo.Model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,13 +14,13 @@ import java.util.Optional;
 public class UserRepository {
     private Connection connection;
 
-    public UserRepository() throws SQLException {
-        this.connection = new Database().getConnection();
+    public UserRepository(Connection connection) throws SQLException {
+        this.connection = connection;
     }
 
 
     public boolean createUser(User user){
-        String sql = "INSERT INTO \"user\" (username, password) VALUES (?, ?)";
+        String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
@@ -35,27 +35,8 @@ public class UserRepository {
     }
 
 
-    public Optional<User> findById(int id) {
-        String sql = "SELECT * FROM user WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return Optional.of(mapResultSetToUser(rs));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar usuário: " + e.getMessage());
-        }
-
-        return Optional.empty();
-    }
-
-
     public Optional<User> findByUsername(String username) {
-        String sql = "SELECT * FROM user WHERE username = ?";
+        String sql = "SELECT * FROM users WHERE username = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -73,9 +54,34 @@ public class UserRepository {
     }
 
 
+    public List<User> findByUsernameLike(String usernamePattern) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE username ILIKE ? ORDER BY username";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            String searchPattern = usernamePattern;
+            if (!usernamePattern.contains("%")) {
+                searchPattern = "%" + usernamePattern + "%";
+            }
+
+            stmt.setString(1, searchPattern);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar usuários por nome similar: " + e.getMessage());
+        }
+
+        return users;
+    }
+
+
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM \"user\"";
+        String sql = "SELECT * FROM users";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -94,10 +100,8 @@ public class UserRepository {
     
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         return new User(
-                rs.getInt("id"),
                 rs.getString("username"),
-                rs.getString("password"),
-                rs.getTimestamp("created_at")
+                rs.getString("password")
         );
     }
 }

@@ -1,0 +1,16 @@
+meta {
+  name: Get sent messages
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://localhost:3030/api/messages/sent/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

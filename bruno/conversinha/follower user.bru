@@ -1,0 +1,16 @@
+meta {
+  name: follower user
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3030/api/followers
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

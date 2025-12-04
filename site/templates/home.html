@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversinha - Home</title>
+    <style>
+        /* ESTILO ANOS 2000 SIMPLIFICADO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #336699;
+            color: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 3px solid #000066;
+            border-radius: 0; /* Sem bordas arredondadas nos anos 2000! */
+            box-shadow: 5px 5px 0px #000033;
+        }
+        
+        /* Cabeçalho */
+        header {
+            background-color: #000066;
+            color: #ffff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px double #ff6600;
+        }
+        
+        header h1 {
+            font-size: 36px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #ff0000;
+            letter-spacing: 1px;
+        }
+        
+        .user-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        
+        /* Menu de navegação */
+        nav {
+            background-color: #ccccff;
+            padding: 10px;
+            border-bottom: 3px dotted #000066;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        nav li {
+            background-color: #ff9900;
+            border: 2px outset #cc6600;
+            padding: 8px 20px;
+        }
+        
+        nav a {
+            color: #000066;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        nav a:hover {
+            color: #ff0000;
+            text-decoration: underline;
+        }
+        
+        /* Conteúdo principal */
+        main {
+            padding: 20px;
+        }
+        
+        .welcome-box {
+            background-color: #e6f2ff;
+            border: 2px inset #6666cc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-box h2 {
+            color: #990000;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        /* Mensagens */
+        .messages-section {
+            background-color: #ffffcc;
+            border: 2px inset #cccc99;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .messages-section h2 {
+            color: #006600;
+            background-color: #ccccff;
+            padding: 8px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 1px dotted #000066;
+        }
+        
+        .messages-container {
+            min-height: 300px;
+        }
+        
+        .message {
+            background-color: #ffffff;
+            border: 1px solid #cccc99;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 5px solid #0066cc;
+        }
+        
+        .message-header {
+            font-weight: bold;
+            color: #006600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .message-sender {
+            color: #0000cc;
+        }
+        
+        .message-time {
+            color: #666666;
+            font-size: 12px;
+        }
+        
+        .message-content {
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .no-messages {
+            text-align: center;
+            padding: 40px;
+            color: #666666;
+            font-style: italic;
+        }
+        
+        /* Botões de ação */
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .old-button {
+            background-color: #cccccc;
+            border: 2px outset #999999;
+            padding: 8px 16px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        
+        .old-button:hover {
+            background-color: #999999;
+            border: 2px inset #666666;
+        }
+        
+        /* Rodapé */
+        footer {
+            background-color: #000066;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            border-top: 5px double #ff6600;
+        }
+        
+        /* Efeito de loading */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #0066cc;
+        }
+        
+        .loading span {
+            animation: blink 1s infinite;
+            font-size: 20px;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        /* Avisos */
+        .warning {
+            background-color: #ffcccc;
+            border: 2px solid #ff0000;
+            padding: 12px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Contador de mensagens */
+        .message-count {
+            background-color: #ff0000;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Conversinha</h1>
+            <p class="user-info">
+                Bem-vindo, <span id="username-display">Usuário</span> | 
+                <a href="#" id="logout-link" style="color:#ffff00;">Sair</a>
+            </p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/send">Enviar Mensagem</a></li>
+                <li><a href="/sent">Mensagens Enviadas</a></li>
+                <!--<li><a href="friends.html">Amigos</a></li> -->
+                <li><a href="/home">Mensagens <span id="message-count" class="message-count">0</span></a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <div class="welcome-box">
+                <h2>Bem-vindo ao Conversinha!</h2>
+                <p>Este é o seu painel de mensagens. Aqui você pode ver todas as mensagens recebidas de seus amigos.</p>
+                <p>Use o menu acima para navegar entre as páginas do site.</p>
+            </div>
+            
+            <div class="messages-section">
+                <h2>📬 Mensagens Recebidas</h2>
+                <div id="messages-container" class="messages-container">
+                    <div class="loading">
+                        <span>Carregando mensagens...</span>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="old-button" id="refresh-btn">Atualizar Mensagens</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Conversinha - O melhor site de mensagens online!</p>
+        </footer>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const username = localStorage.getItem('conversinha_username');
+            
+            if (!username) {
+                window.location.href = '/login';
+                return null;
+            }
+            
+            return username;
+        }
+        
+        function updateUserInfo() {
+            const username = localStorage.getItem('conversinha_username');
+            const usernameDisplay = document.getElementById('username-display');
+            
+            if (username && usernameDisplay) {
+                usernameDisplay.textContent = username;
+            }
+        }
+        
+        async function fetchMessages() {
+            const username = localStorage.getItem('conversinha_username');
+            
+            if (!username) {
+                showError('Usuário não identificado. Faça login novamente.');
+                return { results: [], count: 0 };
+            }
+            
+            try {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = '<div class="loading"><span>Carregando mensagens...</span></div>';
+                
+                console.log(username)
+                const response = await fetch(`http://localhost:3030/api/messages/check/${username}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                const messages = await response.json();
+                return messages;
+                
+            } catch (error) {
+                console.error('Erro ao buscar mensagens:', error);
+                showError(`Erro ao carregar mensagens: ${error.message}`);
+                return { results: [], count: 0 };
+            }
+        }
+        
+        function displayMessages(messages) {
+            const container = document.getElementById('messages-container');
+            const messageCountElement = document.getElementById('message-count');
+            
+            const messagesArray = messages.results || [];
+            const count = messages.count || messagesArray.length;
+            
+            if (messageCountElement) {
+                messageCountElement.textContent = count;
+            }
+            
+            if (messagesArray.length === 0) {
+                container.innerHTML = '<div class="no-messages">Nenhuma mensagem recebida ainda.</div>';
+                return;
+            }
+            
+            messagesArray.sort((a, b) => new Date(b.created_at || b.timestamp || b.date) - new Date(a.created_at || a.timestamp || a.date));
+            
+            let messagesHTML = '';
+            
+            messagesArray.forEach((message, index) => {
+                let displayDate = 'Data desconhecida';
+                const date = message.created_at || message.timestamp || message.date;
+                
+                if (date) {
+                    try {
+                        const dateObj = new Date(date);
+                        displayDate = dateObj.toLocaleString('pt-BR');
+                    } catch (e) {
+                        try {
+                            // Corrigir formato removendo espaço após o ano
+                            const fixedDate = String(date).replace(/(\d{4}-\d{2}-\d{2})(\d{2}):/, '$1 $2:');
+                            const dateObj = new Date(fixedDate);
+                            if (!isNaN(dateObj.getTime())) {
+                                displayDate = dateObj.toLocaleString('pt-BR');
+                            } else {
+                                displayDate = date;
+                            }
+                        } catch (e2) {
+                            displayDate = date;
+                        }
+                    }
+                }
+                
+                const id = message.id || '';
+                const sender = message.sender || 'Remetente desconhecido';
+                const recipient = message.recipient || '';
+                const title = message.title || 'sem titulo'
+                const content = message.content || 'Sem conteúdo';
+                                
+                messagesHTML += `
+                    <div class="message">
+                        <a href="/view?id=${id}" style="text-decoration: none;">
+                        <div class="message-header">
+                            <div>
+                                De: <span class="message-sender">${sender}</span>
+                            </div>
+                            <div class="message-time">${displayDate}</div>
+                        </div>
+                        <div><strong>titulo:</strong> ${title}</div>
+                        <div class="message-content">${content.length > 50 ? content.substring(0, 50) + '...' : content}</div>
+                        </a>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = messagesHTML;
+        }
+        
+        function logout(){
+            localStorage.clear('conversinha_username')
+            checkLogin()
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = checkLogin();
+            if (!username) return;
+            
+            updateUserInfo();
+            
+            
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+            
+            const refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', async function() {
+                    this.textContent = 'Atualizando...';
+                    this.disabled = true;
+                    
+                    const messages = await fetchMessages();
+                    displayMessages(messages);
+                    
+                    this.textContent = 'Atualizar Mensagens';
+                    this.disabled = false;
+                });
+            }
+            
+            async function loadMessages() {
+                const messages = await fetchMessages();
+                displayMessages(messages);
+            }
+            
+            loadMessages();
+            
+            const buttons = document.querySelectorAll('.old-button');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.border = '2px inset #666666';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.border = '2px outset #999999';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

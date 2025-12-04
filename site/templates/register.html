@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversinha - Registrar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #336699;
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .register-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border: 3px solid #000066;
+            box-shadow: 5px 5px 0px #000033;
+        }
+        
+        .register-header {
+            background-color: #000066;
+            color: #ffff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px double #ff6600;
+        }
+        
+        .register-header h1 {
+            font-size: 36px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #ff0000;
+            letter-spacing: 1px;
+        }
+        
+        .register-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #000066;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px inset #999999;
+            background-color: #ffffcc;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border: 2px inset #0066cc;
+            background-color: #ffffe6;
+        }
+        
+        .register-button {
+            width: 100%;
+            background-color: #cccccc;
+            border: 2px outset #999999;
+            padding: 12px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .register-button:hover {
+            background-color: #999999;
+            border: 2px inset #666666;
+        }
+        
+        .register-button:active {
+            background-color: #666666;
+            color: #ffffff;
+        }
+        
+        .message {
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            background-color: #ffcccc;
+            border: 2px solid #ff0000;
+            color: #990000;
+        }
+        
+        .success-message {
+            background-color: #ccffcc;
+            border: 2px solid #00cc00;
+            color: #006600;
+        }
+        
+        .register-footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-top: 1px dashed #999999;
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .login-link a {
+            color: #0000cc;
+            text-decoration: none;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+            color: #ff0000;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: #0066cc;
+        }
+        
+        .loading span {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Conversinha</h1>
+            <p style="color:#ffffff; font-size:14px; margin-top:5px;">Crie sua conta para começar</p>
+        </div>
+        
+        <div class="register-form">
+            <div id="message-container"></div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário:</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Digite seu username"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Digite sua senha"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Confirmar Senha:</label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm-password" 
+                        class="form-input" 
+                        placeholder="Digite sua senha novamente"
+                        required
+                    >
+                </div>
+                
+                <button type="submit" class="register-button" id="registerButton">
+                    Criar Conta
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>Já tem uma conta? <a href="/login">Faça login</a></p>
+            </div>
+        </div>
+        
+        <div class="register-footer">
+            <p>Conversinha © 2004-2007</p>
+            <p>Conecte-se com seus amigos!</p>
+        </div>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            
+            container.innerHTML = '';
+            
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}-message`;
+                messageDiv.textContent = message;
+                container.appendChild(messageDiv);
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageDiv.style.opacity = '0';
+                        messageDiv.style.transition = 'opacity 0.5s';
+                        setTimeout(() => {
+                            if (container.contains(messageDiv)) {
+                                container.removeChild(messageDiv);
+                            }
+                        }, 500);
+                    }, 3000);
+                }
+            }
+        }
+        
+        async function register(username, password) {
+            try {
+                const registerButton = document.getElementById('registerButton');
+                const originalText = registerButton.textContent;
+                registerButton.textContent = 'Criando conta...';
+                registerButton.disabled = true;
+                
+                const response = await fetch('http://localhost:3030/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                registerButton.textContent = originalText;
+                registerButton.disabled = false;
+                
+                if (response.status === 201) {
+                    const data = await response.json();
+                    
+                    showMessage(data.message || 'Conta criada com sucesso!', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 1500);
+                    
+                    return true;
+                } else {
+                    let errorMessage = 'Erro ao criar conta';
+                    
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Erro ${response.status}: ${response.statusText}`;
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                
+                const registerButton = document.getElementById('registerButton');
+                registerButton.textContent = 'Criar Conta';
+                registerButton.disabled = false;
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    showMessage('Erro de conexão. Verifique se o servidor está rodando em localhost:3030', 'error');
+                } else {
+                    showMessage('Erro inesperado: ' + error.message, 'error');
+                }
+                
+                return false;
+            }
+        }
+        
+        function validateForm(username, password, confirmPassword) {
+            if (!username || username.trim() === '') {
+                showMessage('Por favor, digite um nome de usuário', 'error');
+                return false;
+            }
+            
+            if (username.length < 3) {
+                showMessage('O nome de usuário deve ter pelo menos 3 caracteres', 'error');
+                return false;
+            }
+            
+            if (!password || password.trim() === '') {
+                showMessage('Por favor, digite uma senha', 'error');
+                return false;
+            }
+            
+            if (password.length < 3) {
+                showMessage('A senha deve ter pelo menos 3 caracteres', 'error');
+                return false;
+            }
+            
+            if (!confirmPassword || confirmPassword.trim() === '') {
+                showMessage('Por favor, confirme sua senha', 'error');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('As senhas não coincidem', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function checkAlreadyLoggedIn() {
+            const username = localStorage.getItem('conversinha_username');
+            if (username) {
+                window.location.href = 'home.html';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAlreadyLoggedIn();
+            
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirm-password').value;
+                    
+                    if (validateForm(username, password, confirmPassword)) {
+                        await register(username, password);
+                    }
+                });
+            }
+            
+            const registerButton = document.getElementById('registerButton');
+            if (registerButton) {
+                registerButton.addEventListener('mousedown', function() {
+                    this.style.border = '2px inset #666666';
+                });
+                
+                registerButton.addEventListener('mouseup', function() {
+                    this.style.border = '2px outset #999999';
+                });
+                
+                registerButton.addEventListener('mouseleave', function() {
+                    this.style.border = '2px outset #999999';
+                });
+            }
+            
+            document.getElementById('username').focus();
+            
+            const autoFill = document.createElement('div');
+            autoFill.style.textAlign = 'center';
+            autoFill.style.marginTop = '15px';
+            autoFill.style.fontSize = '12px';
+            autoFill.innerHTML = '<a href="#" id="autoFill" style="color:#6666cc;">Usar dados de exemplo</a>';
+            document.querySelector('.login-link').appendChild(autoFill);
+            
+            document.getElementById('autoFill').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('username').value = 'novousuario';
+                document.getElementById('password').value = '123';
+                document.getElementById('confirm-password').value = '123';
+                showMessage('Dados de exemplo preenchidos. Clique em "Criar Conta" para testar.', 'success');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversinha - Enviar Mensagem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #336699;
+            color: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 3px solid #000066;
+            border-radius: 0;
+            box-shadow: 5px 5px 0px #000033;
+        }
+        
+        header {
+            background-color: #000066;
+            color: #ffff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px double #ff6600;
+        }
+        
+        header h1 {
+            font-size: 36px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #ff0000;
+            letter-spacing: 1px;
+        }
+        
+        .user-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        
+        nav {
+            background-color: #ccccff;
+            padding: 10px;
+            border-bottom: 3px dotted #000066;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        nav li {
+            background-color: #ff9900;
+            border: 2px outset #cc6600;
+            padding: 8px 20px;
+        }
+        
+        nav a {
+            color: #000066;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        nav a:hover {
+            color: #ff0000;
+            text-decoration: underline;
+        }
+        
+        main {
+            padding: 20px;
+        }
+        
+        .send-box {
+            background-color: #e6f2ff;
+            border: 2px inset #6666cc;
+            padding: 20px;
+        }
+        
+        .send-box h2 {
+            color: #990000;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #000066;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px inset #999999;
+            background-color: #ffffcc;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            border: 2px inset #0066cc;
+            background-color: #ffffe6;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px inset #999999;
+            background-color: #ffffcc;
+            font-size: 16px;
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .form-textarea:focus {
+            border: 2px inset #0066cc;
+            background-color: #ffffe6;
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .old-button {
+            background-color: #cccccc;
+            border: 2px outset #999999;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+        
+        .old-button:hover {
+            background-color: #999999;
+            border: 2px inset #666666;
+        }
+        
+        footer {
+            background-color: #000066;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            border-top: 5px double #ff6600;
+        }
+        
+        .message-box {
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .success {
+            background-color: #ccffcc;
+            border: 2px solid #00cc00;
+            color: #006600;
+        }
+        
+        .error {
+            background-color: #ffcccc;
+            border: 2px solid #ff0000;
+            color: #990000;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #0066cc;
+        }
+        
+        .loading span {
+            animation: blink 1s infinite;
+            font-size: 20px;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Conversinha</h1>
+            <p class="user-info">
+                Bem-vindo, <span id="username-display">Usuário</span> | 
+                <a href="#" id="logout-link" style="color:#ffff00;">Sair</a>
+            </p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/send">Enviar Mensagem</a></li>
+                <li><a href="/sent">Mensagens Enviadas</a></li>
+                <!--<li><a href="friends.html">Amigos</a></li> -->
+                <li><a href="/home">Mensagens <span id="message-count" class="message-count">0</span></a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <div class="send-box">
+                <h2>📨 Enviar Nova Mensagem</h2>
+                
+                <div id="message-box" class="message-box"></div>
+                
+                <form id="send-form">
+                    <div class="form-group">
+                        <label for="recipient">Para:</label>
+                        <input 
+                            type="text" 
+                            id="recipient" 
+                            class="form-input" 
+                            placeholder="Digite o nome do amigo"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title">Assunto:</label>
+                        <input 
+                            type="text" 
+                            id="title" 
+                            class="form-input" 
+                            placeholder="Digite o assunto da mensagem"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">Mensagem:</label>
+                        <textarea 
+                            id="content" 
+                            class="form-textarea" 
+                            placeholder="Digite sua mensagem aqui..."
+                            required
+                        ></textarea>
+                    </div>
+                    
+                    <div class="actions">
+                        <button type="submit" class="old-button" id="send-button">Enviar Mensagem</button>
+                        <button type="reset" class="old-button">Limpar</button>
+                        <a href="home.html" class="old-button">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Conversinha © 2004-2007 - Envie mensagens para seus amigos!</p>
+        </footer>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const username = localStorage.getItem('conversinha_username');
+            
+            if (!username) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return username;
+        }
+        
+        function updateUserInfo() {
+            const username = localStorage.getItem('conversinha_username');
+            const usernameDisplay = document.getElementById('username-display');
+            
+            if (username && usernameDisplay) {
+                usernameDisplay.textContent = username;
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('conversinha_username');
+            window.location.href = 'login.html';
+        }
+        
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = text;
+            messageBox.className = 'message-box ' + type;
+            messageBox.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageBox.style.opacity = '0';
+                    messageBox.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        messageBox.style.display = 'none';
+                        messageBox.style.opacity = '1';
+                    }, 500);
+                }, 3000);
+            }
+        }
+        
+        async function sendMessage(messageData) {
+            try {
+                const sendButton = document.getElementById('send-button');
+                sendButton.textContent = 'Enviando...';
+                sendButton.disabled = true;
+                
+                const response = await fetch('http://localhost:3030/api/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(messageData)
+                });
+                
+                sendButton.textContent = 'Enviar Mensagem';
+                sendButton.disabled = false;
+                
+                if (response.status === 201) {
+                    const data = await response.json();
+                    showMessage(data.message || 'Mensagem enviada com sucesso!', 'success');
+                    document.getElementById('send-form').reset();
+                    return true;
+                } else {
+                    let errorText = 'Erro ao enviar mensagem';
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.message || errorText;
+                    } catch (e) {
+                        errorText = `Erro ${response.status}: ${response.statusText}`;
+                    }
+                    showMessage(errorText, 'error');
+                    return false;
+                }
+            } catch (error) {
+                const sendButton = document.getElementById('send-button');
+                sendButton.textContent = 'Enviar Mensagem';
+                sendButton.disabled = false;
+                
+                if (error.message.includes('Failed to fetch')) {
+                    showMessage('Erro de conexão. Verifique se o servidor está rodando.', 'error');
+                } else {
+                    showMessage('Erro: ' + error.message, 'error');
+                }
+                return false;
+            }
+        }
+        
+        function validateForm(recipient, title, content) {
+            if (!recipient || recipient.trim() === '') {
+                showMessage('Digite o nome do destinatário', 'error');
+                return false;
+            }
+            
+            if (!title || title.trim() === '') {
+                showMessage('Digite o assunto da mensagem', 'error');
+                return false;
+            }
+            
+            if (!content || content.trim() === '') {
+                showMessage('Digite o conteúdo da mensagem', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = checkLogin();
+            if (!username) return;
+            
+            updateUserInfo();
+            
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+            
+            const sendForm = document.getElementById('send-form');
+            if (sendForm) {
+                sendForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const sender = localStorage.getItem('conversinha_username');
+                    const recipient = document.getElementById('recipient').value;
+                    const title = document.getElementById('title').value;
+                    const content = document.getElementById('content').value;
+                    
+                    if (validateForm(recipient, title, content)) {
+                        const messageData = {
+                            sender: sender,
+                            recipient: recipient,
+                            title: title,
+                            content: content
+                        };
+                        
+                        await sendMessage(messageData);
+                    }
+                });
+            }
+            
+            const buttons = document.querySelectorAll('.old-button');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.border = '2px inset #666666';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.border = '2px outset #999999';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.border = '2px outset #999999';
+                });
+            });
+            
+            const recipientInput = document.getElementById('recipient');
+            if (recipientInput) {
+                recipientInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

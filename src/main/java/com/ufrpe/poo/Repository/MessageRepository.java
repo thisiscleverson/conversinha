@@ -1,90 +1,105 @@
 package com.ufrpe.poo.Repository;
 
 import com.ufrpe.poo.Database.Database;
-import com.ufrpe.poo.model.Message;
+import com.ufrpe.poo.Model.Message;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MessageRepository {
     private Connection connection;
 
-    MessageRepository(){
-        this.connection = new Database().getConnection();
+    public MessageRepository(Connection connection) {
+        this.connection = connection;
     }
 
-    public boolean sendMessage(Message message) {
-        String sql = "INSERT INTO message (senderId, recipientId, content) VALUES (?, ?, ?)";
+    public int registerMessage(Message message) {
+        String sql = "INSERT INTO messages (sender, recipient, title, content) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, message.getSenderId());
-            stmt.setInt(2, message.getRecipientId());
-            stmt.setString(3, message.getContent());
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, message.getSender());
+            stmt.setString(2, message.getRecipient());
+            stmt.setString(3, message.getTitle());
+            stmt.setString(4, message.getContent());
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            return -1; // Falha
 
         } catch (SQLException e) {
             System.err.println("Erro ao enviar mensagem: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    public Optional<Message> getMessageById(int messageId) {
+        String sql = """
+            SELECT *
+            FROM messages
+            WHERE id = ?
+        """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, messageId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(mapResultSetToMessage(rs));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar mensagem: " + e.getMessage());
+        }
+
+        return Optional.empty();
+    }
+
+    public List<Message> getReceivedMessages(String recipient) {
+        return getMessagesByRecipient(recipient);
+    }
+
+    public List<Message> getSentMessages(String sender) {
+        return getMessagesBySender(sender);
+    }
+
+    public boolean updateDelivereStatus(int messageId){
+        String sql = """
+            UPDATE messages
+            SET is_delivered = true
+            WHERE id = ? and is_delivered = false;
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, messageId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Não foi possivel atualizar o status dessa conversa: " + e.getMessage());
             return false;
         }
     }
 
-    public List<Message> getConversation(int user1Id, int user2Id) {
+
+    private List<Message> getMessagesByRecipient(String recipient) {
         List<Message> messages = new ArrayList<>();
         String sql = """
-            SELECT m.*, u1.username as sender_name, u2.username as recipient_name 
-            FROM message m 
-            JOIN user u1 ON m.senderId = u1.id 
-            JOIN user u2 ON m.recipientId = u2.id 
-            WHERE (m.senderId = ? AND m.recipientId = ?) 
-               OR (m.senderId = ? AND m.recipientId = ?) 
-            ORDER BY m.created_at
-            """;
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, user1Id);
-            stmt.setInt(2, user2Id);
-            stmt.setInt(3, user2Id);
-            stmt.setInt(4, user1Id);
-
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                messages.add(mapResultSetToMessage(rs));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar conversa: " + e.getMessage());
-        }
-
-        return messages;
-    }
-
-    public List<Message> getReceivedMessages(int userId) {
-        return getMessagesByRecipient(userId);
-    }
-
-    public List<Message> getSentMessages(int userId) {
-        return getMessagesBySender(userId);
-    }
-
-    private List<Message> getMessagesByRecipient(int recipientId) {
-        List<Message> messages = new ArrayList<>();
-        String sql = """
-            SELECT m.*, u.username as sender_name 
-            FROM message m 
-            JOIN user u ON m.senderId = u.id 
-            WHERE m.recipientId = ? 
+            SELECT *
+            FROM messages m
+            WHERE m.recipient = ? AND m.is_delivered = false
             ORDER BY m.created_at DESC
             """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, recipientId);
+            stmt.setString(1, recipient);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -98,18 +113,17 @@ public class MessageRepository {
         return messages;
     }
 
-    private List<Message> getMessagesBySender(int senderId) {
+    private List<Message> getMessagesBySender(String sender) {
         List<Message> messages = new ArrayList<>();
         String sql = """
-            SELECT m.*, u.username as recipient_name 
-            FROM message m 
-            JOIN user u ON m.recipientId = u.id 
-            WHERE m.senderId = ? 
+            SELECT *
+            FROM messages m
+            WHERE m.sender = ?
             ORDER BY m.created_at DESC
             """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, senderId);
+            stmt.setString(1, sender);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -124,27 +138,16 @@ public class MessageRepository {
     }
 
     private Message mapResultSetToMessage(ResultSet rs) throws SQLException {
-        Message message = new Message();
-        message.setId(rs.getInt("id"));
-        message.setSenderId(rs.getInt("senderId"));
-        message.setRecipientId(rs.getInt("recipientId"));
-        message.setContent(rs.getString("content"));
-        message.setCreatedAt(rs.getTimestamp("created_at"));
+        Message message = new Message(
+                rs.getInt("id"),
+                rs.getString("sender"),
+                rs.getString("recipient"),
+                rs.getString("title"),
+                rs.getString("content"),
+                rs.getBoolean("is_delivered"),
+                rs.getTimestamp("created_at")
+        );
 
-        /*
-        // Campos adicionais dos JOINs
-        try {
-            message.setSenderName(rs.getString("sender_name"));
-        } catch (SQLException e) {
-            // Campo não existe neste ResultSet
-        }
-
-        try {
-            message.setRecipientName(rs.getString("recipient_name"));
-        } catch (SQLException e) {
-            // Campo não existe neste ResultSet
-        }
-         */
 
         return message;
     }

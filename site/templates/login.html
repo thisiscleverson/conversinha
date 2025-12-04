@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversinha - Login</title>
+    <style>
+        /* ESTILO ANOS 2000 SIMPLIFICADO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #336699;
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border: 3px solid #000066;
+            box-shadow: 5px 5px 0px #000033;
+        }
+        
+        /* Cabeçalho */
+        .login-header {
+            background-color: #000066;
+            color: #ffff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px double #ff6600;
+        }
+        
+        .login-header h1 {
+            font-size: 36px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #ff0000;
+            letter-spacing: 1px;
+        }
+        
+        /* Formulário */
+        .login-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #000066;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px inset #999999;
+            background-color: #ffffcc;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border: 2px inset #0066cc;
+            background-color: #ffffe6;
+        }
+        
+        /* Botão */
+        .login-button {
+            width: 100%;
+            background-color: #cccccc;
+            border: 2px outset #999999;
+            padding: 12px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            background-color: #999999;
+            border: 2px inset #666666;
+        }
+        
+        .login-button:active {
+            background-color: #666666;
+            color: #ffffff;
+        }
+        
+        /* Mensagens */
+        .message {
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            background-color: #ffcccc;
+            border: 2px solid #ff0000;
+            color: #990000;
+        }
+        
+        .success-message {
+            background-color: #ccffcc;
+            border: 2px solid #00cc00;
+            color: #006600;
+        }
+        
+        /* Rodapé */
+        .login-footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-top: 1px dashed #999999;
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        /* Link */
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .register-link a {
+            color: #0000cc;
+            text-decoration: none;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+            color: #ff0000;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: #0066cc;
+        }
+        
+        .loading span {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Conversinha</h1>
+            <p style="color:#ffffff; font-size:14px; margin-top:5px;">Faça login para acessar suas mensagens</p>
+        </div>
+        
+        <div class="login-form">
+            <div id="message-container"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário:</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Digite seu username"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Digite sua senha"
+                        required
+                    >
+                </div>
+                
+                <button type="submit" class="login-button" id="loginButton">
+                    Entrar no Conversinha
+                </button>
+            </form>
+            
+            <div class="register-link">
+                <p>Não tem uma conta? <a href="#" id="registerLink">Criar conta</a></p>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <p>Conversinha © 2004-2007</p>
+            <p>O melhor site de mensagens online!</p>
+        </div>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            
+            container.innerHTML = '';
+            
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}-message`;
+                messageDiv.textContent = message;
+                container.appendChild(messageDiv);
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageDiv.style.opacity = '0';
+                        messageDiv.style.transition = 'opacity 0.5s';
+                        setTimeout(() => {
+                            if (container.contains(messageDiv)) {
+                                container.removeChild(messageDiv);
+                            }
+                        }, 500);
+                    }, 3000);
+                }
+            }
+        }
+        
+        async function login(username, password) {
+            try {
+                const loginButton = document.getElementById('loginButton');
+                const originalText = loginButton.textContent;
+                loginButton.textContent = 'Conectando...';
+                loginButton.disabled = true;
+                
+                const response = await fetch(`http://localhost:3030/api/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+                
+                loginButton.textContent = originalText;
+                loginButton.disabled = false;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    localStorage.setItem('conversinha_username', data.username);
+                    
+                    showMessage(data.message || 'Login realizado com sucesso!', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/home';
+                    }, 1500);
+                    
+                    return true;
+                } else {
+                    let errorMessage = 'Erro ao fazer login';
+                    
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Erro ${response.status}: ${response.statusText}`;
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                
+                const loginButton = document.getElementById('loginButton');
+                loginButton.textContent = 'Entrar no Conversinha';
+                loginButton.disabled = false;
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    showMessage('Erro de conexão. Verifique se o servidor está rodando em localhost:3030', 'error');
+                } else {
+                    showMessage('Erro inesperado: ' + error.message, 'error');
+                }
+                
+                return false;
+            }
+        }
+        
+        function validateForm(username, password) {
+            if (!username || username.trim() === '') {
+                showMessage('Por favor, digite seu nome de usuário', 'error');
+                return false;
+            }
+            
+            if (!password || password.trim() === '') {
+                showMessage('Por favor, digite sua senha', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function handleRegister() {            
+            setTimeout(() => {
+                window.location.href = '/register';
+            }, 500);
+        }
+        
+        function checkAlreadyLoggedIn() {
+            const username = localStorage.getItem('conversinha_username');
+            if (username) {
+                window.location.href = '/home';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAlreadyLoggedIn();
+            
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (validateForm(username, password)) {
+                        await login(username, password);
+                    }
+                });
+            }
+            
+            const registerLink = document.getElementById('registerLink');
+            if (registerLink) {
+                registerLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleRegister();
+                });
+            }
+            
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.addEventListener('mousedown', function() {
+                    this.style.border = '2px inset #666666';
+                });
+                
+                loginButton.addEventListener('mouseup', function() {
+                    this.style.border = '2px outset #999999';
+                });
+                
+                loginButton.addEventListener('mouseleave', function() {
+                    this.style.border = '2px outset #999999';
+                });
+            }
+            
+            document.getElementById('username').focus();
+            
+            //const testLink = document.createElement('div');
+            //testLink.style.textAlign = 'center';
+            //testLink.style.marginTop = '15px';
+            //testLink.style.fontSize = '12px';
+            // testLink.innerHTML = '<a href="#" id="testUser" style="color:#6666cc;">Usar usuário de teste</a>';
+            //document.querySelector('.register-link').appendChild(testLink);
+            
+            document.getElementById('testUser').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('username').value = 'cleverson';
+                document.getElementById('password').value = '123';
+                showMessage('Usuário de teste preenchido. Clique em "Entrar no Conversinha"', 'success');
+            });
+        });
+    </script>
+</body>
+</html>

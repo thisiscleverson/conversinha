@@ -2,34 +2,35 @@ CREATE DATABASE IF NOT EXISTS conversinha;
 USE conversinha;
 
 
-CREATE TABLE IF NOT EXISTS user (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS users (
+    username VARCHAR(50) NOT NULL UNIQUE primary key,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TABLE IF NOT EXISTS message (
+CREATE TABLE IF NOT EXISTS messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    senderId INT NOT NULL,
-    recipientId INT NOT NULL,
+    sender VARCHAR(50) NOT NULL,
+    recipient VARCHAR(50) NOT NULL,
+    title VARCHAR(500) NOT NULL
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (senderId) REFERENCES user(id) ON DELETE CASCADE,
-    FOREIGN KEY (recipientId) REFERENCES user(id) ON DELETE CASCADE
+    FOREIGN KEY (sender) REFERENCES users(username) ON DELETE CASCADE,
+    FOREIGN KEY (recipient) REFERENCES users(username) ON DELETE CASCADE
 );
 
 
 CREATE TABLE IF NOT EXISTS follower (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    followerId INT NOT NULL,
+    "user" VARCHAR(50) NOT NULL,
+    follower VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
-    FOREIGN KEY (followerId) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY ("user") REFERENCES users(username) ON DELETE CASCADE,
+    FOREIGN KEY (follower) REFERENCES users(username) ON DELETE CASCADE,
     -- Evitar duplicatas de seguidores
-    UNIQUE KEY unique_follow (userId, followerId),
-    -- Impedir que um usuário siga a si mesmo
-    CHECK (userId != followerId)
+    UNIQUE KEY unique_follow ("user", follower),
 );
+
+
+ALTER TABLE follower ADD CONSTRAINT check_self_follow
+    CHECK ("user" != "follower");

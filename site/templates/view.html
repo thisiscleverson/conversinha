@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversinha - Ler Mensagem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #336699;
+            color: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 3px solid #000066;
+            border-radius: 0;
+            box-shadow: 5px 5px 0px #000033;
+        }
+
+        header {
+            background-color: #000066;
+            color: #ffff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px double #ff6600;
+        }
+
+        header h1 {
+            font-size: 36px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #ff0000;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        nav {
+            background-color: #ccccff;
+            padding: 10px;
+            border-bottom: 3px dotted #000066;
+        }
+
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        nav li {
+            background-color: #ff9900;
+            border: 2px outset #cc6600;
+            padding: 8px 20px;
+        }
+
+        nav a {
+            color: #000066;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: #ff0000;
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .message-box {
+            background-color: #e6f2ff;
+            border: 2px inset #6666cc;
+            padding: 25px;
+        }
+
+        .message-box h2 {
+            color: #990000;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #000066;
+            padding-bottom: 10px;
+        }
+
+        .message-details {
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .message-field {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dotted #cccccc;
+        }
+
+        .message-label {
+            font-weight: bold;
+            color: #000066;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .message-value {
+            color: #000000;
+            font-size: 16px;
+        }
+
+        .message-content-box {
+            background-color: #ffffcc;
+            border: 2px inset #cccc99;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 150px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .old-button {
+            background-color: #cccccc;
+            border: 2px outset #999999;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+
+        .old-button:hover {
+            background-color: #999999;
+            border: 2px inset #666666;
+        }
+
+        footer {
+            background-color: #000066;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            border-top: 5px double #ff6600;
+        }
+
+        .error-box {
+            background-color: #ffcccc;
+            border: 2px solid #ff0000;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #990000;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #0066cc;
+        }
+
+        .loading span {
+            animation: blink 1s infinite;
+            font-size: 20px;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .message-id {
+            color: #666666;
+            font-size: 12px;
+            font-style: italic;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .message-count {
+            background-color: #ff0000;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Conversinha</h1>
+        <p class="user-info">
+            Bem-vindo, <span id="username-display">Usuário</span> |
+            <a href="#" id="logout-link" style="color:#ffff00;">Sair</a>
+        </p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/home">Home</a></li>
+                <li><a href="/send">Enviar Mensagem</a></li>
+                <li><a href="/sent">Mensagens Enviadas</a></li>
+                <!--<li><a href="friends.html">Amigos</a></li> -->
+                <li><a href="/home">Mensagens <span id="message-count" class="message-count">0</span></a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="message-box">
+            <h2>📖 Ler Mensagem</h2>
+
+            <div id="message-container">
+                <div class="loading">
+                    <span>Carregando mensagem...</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/home" class="old-button">Voltar</a>
+                <!--<button class="old-button" id="delete-button">Excluir</button>
+                <button class="old-button" id="reply-button">Responder</button> -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Conversinha - Leia suas mensagens!</p>
+    </footer>
+</div>
+
+<script>
+    function checkLogin() {
+        const username = localStorage.getItem('conversinha_username');
+
+        if (!username) {
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        return username;
+    }
+
+    function updateUserInfo() {
+        const username = localStorage.getItem('conversinha_username');
+        const usernameDisplay = document.getElementById('username-display');
+
+        if (username && usernameDisplay) {
+            usernameDisplay.textContent = username;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('conversinha_username');
+        window.location.href = 'login.html';
+    }
+
+    function getMessageIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id');
+    }
+
+    async function fetchMessage() {
+        const messageId = getMessageIdFromUrl();
+
+        if (!messageId) {
+            showError('ID da mensagem não especificado');
+            return null;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3030/api/messages/message/${messageId}`);
+
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            }
+
+            const message = await response.json();
+            return message;
+
+        } catch (error) {
+            console.error('Erro ao buscar mensagem:', error);
+
+            if (error.message.includes('Failed to fetch')) {
+                showError('Erro de conexão. Verifique se o servidor está rodando.');
+            } else {
+                showError(`Erro ao carregar mensagem: ${error.message}`);
+            }
+
+            return null;
+        }
+    }
+
+    async function updateMessageCount() {
+        const username = localStorage.getItem('conversinha_username');
+        
+        if (!username) {
+            return 0;
+        }
+        
+        try {
+            const response = await fetch(`http://localhost:3030/api/messages/check/${username}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            }
+            
+            const responseText = await response.text();
+            let messages;
+            
+            try {
+                messages = JSON.parse(responseText);
+            } catch (parseError) {
+                console.warn('JSON parse error in count update:', parseError);
+                
+                const fixedJson = responseText.replace(
+                    /"created_at":\s*(\d{4}-\d{2}-\d{2})(\d{2}):\s*(\d{2}):\s*(\d{2}\.\d+)/g,
+                    '"created_at": "$1 $2:$3:$4"'
+                );
+                
+                try {
+                    messages = JSON.parse(fixedJson);
+                } catch (secondParseError) {
+                    const countMatch = responseText.match(/"count":\s*(\d+)/);
+                    const count = countMatch ? parseInt(countMatch[1]) : 0;
+                    return count;
+                }
+            }
+            
+            const messageCountElement = document.getElementById('message-count');
+            if (messageCountElement) {
+                messageCountElement.textContent = messages.count || 0;
+            }
+            
+            return messages.count || 0;
+            
+        } catch (error) {
+            console.error('Erro ao atualizar contagem de mensagens:', error);
+            return 0;
+        }
+    }
+
+    function showError(message) {
+        const container = document.getElementById('message-container');
+        container.innerHTML = `<div class="error-box">${message}</div>`;
+    }
+
+    function displayMessage(message) {
+        const container = document.getElementById('message-container');
+
+        if (!message) {
+            showError('Mensagem não encontrada');
+            return;
+        }
+
+        const date = new Date(message.created_at);
+        const formattedDate = date.toLocaleString('pt-BR');
+
+        const status = message.is_delivered ? 'Entregue ✓' : 'Não entregue';
+
+        const html = `
+            <div class="message-details">
+                <div class="message-field">
+                    <span class="message-label">De:</span>
+                    <span class="message-value">${message.sender || 'Desconhecido'}</span>
+                </div>
+
+                <div class="message-field">
+                    <span class="message-label">Titulo:</span>
+                    <span class="message-value">${message.title || 'Sem assunto'}</span>
+                </div>
+
+                <div class="message-field">
+                    <span class="message-label">Data:</span>
+                    <span class="message-value">${formattedDate}</span>
+                </div>
+
+            </div>
+
+            <div class="message-content-box">
+                ${message.content || 'Sem conteúdo'}
+            </div>
+
+            <div class="message-id">
+                ID da mensagem: ${message.id}
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    function setupReplyButton(message) {
+        const replyButton = document.getElementById('reply-button');
+
+        if (replyButton && message) {
+            replyButton.addEventListener('click', function() {
+                const sender = message.sender;
+                const subject = message.title ? `Re: ${message.title}` : 'Re: Mensagem';
+
+                window.location.href = `send.html?to=${encodeURIComponent(sender)}&subject=${encodeURIComponent(subject)}`;
+            });
+        }
+    }
+
+    function setupDeleteButton(messageId) {
+        const deleteButton = document.getElementById('delete-button');
+
+        if (deleteButton && messageId) {
+            deleteButton.addEventListener('click', async function() {
+                if (confirm('Tem certeza que deseja excluir esta mensagem?')) {
+                    try {
+                        const response = await fetch(`http://localhost:3030/api/messages/message/${messageId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            alert('Mensagem excluída com sucesso!');
+                            window.location.href = 'home.html';
+                        } else {
+                            alert('Erro ao excluir mensagem');
+                        }
+                    } catch (error) {
+                        console.error('Erro ao excluir mensagem:', error);
+                        alert('Erro ao excluir mensagem');
+                    }
+                }
+            });
+        }
+    }
+
+    async function loadMessage() {
+        const message = await fetchMessage();
+        displayMessage(message);
+
+        if (message) {
+            setupReplyButton(message);
+            setupDeleteButton(message.id);
+        }
+
+        await updateMessageCount();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = checkLogin();
+        if (!username) return;
+
+        updateUserInfo();
+
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+
+        const buttons = document.querySelectorAll('.old-button');
+        buttons.forEach(button => {
+            button.addEventListener('mousedown', function() {
+                this.style.border = '2px inset #666666';
+            });
+
+            button.addEventListener('mouseup', function() {
+                this.style.border = '2px outset #999999';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.border = '2px outset #999999';
+            });
+        });
+
+        loadMessage();
+    });
+</script>
+</body>
+</html>

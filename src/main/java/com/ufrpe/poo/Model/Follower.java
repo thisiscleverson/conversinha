@@ -1,4 +1,4 @@
-package com.ufrpe.poo.model;
+package com.ufrpe.poo.Model;
 
 import java.sql.Timestamp;
 

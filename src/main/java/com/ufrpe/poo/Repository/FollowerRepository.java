@@ -1,7 +1,8 @@
 package com.ufrpe.poo.Repository;
 
 import com.ufrpe.poo.Database.Database;
-import com.ufrpe.poo.model.Follower;
+import com.ufrpe.poo.Model.Follower;
+import com.ufrpe.poo.Model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,22 +14,23 @@ import java.util.List;
 public class FollowerRepository {
     private Connection connection;
 
-    public FollowerRepository() throws SQLException {
-        this.connection = new Database().getConnection();
+
+    public FollowerRepository(Connection connection) throws SQLException {
+        this.connection = connection;
     }
 
 
-    public boolean followUser(int userId, int followerId) {
-        if (userId == followerId) {
+    public boolean followUser(String user, String follower) {
+        if (user.equals(follower)) {
             System.err.println("Um usuário não pode seguir a si mesmo");
             return false;
         }
 
-        String sql = "INSERT INTO follower (userId, followerId) VALUES (?, ?)";
+        String sql = "INSERT INTO follower (\"user\", follower) VALUES (?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, followerId);
+            stmt.setString(1, user);
+            stmt.setString(2, follower);
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -40,12 +42,12 @@ public class FollowerRepository {
     }
 
 
-    public boolean unfollowUser(int userId, int followerId) {
-        String sql = "DELETE FROM follower WHERE userId = ? AND followerId = ?";
+    public boolean unfollowUser(String user, String follower) {
+        String sql = "DELETE FROM follower WHERE \"user\" = ? AND follower = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, followerId);
+            stmt.setString(1, user);
+            stmt.setString(2, follower);
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -78,23 +80,26 @@ public class FollowerRepository {
     }
 
 
-    public List<Follower> getFollowers(int userId) {
-        List<Follower> followers = new ArrayList<>();
+    public List<String> getFollowers(String username) {
+        List<String> followers = new ArrayList<>();
+        // TODO: Melhorar a query
         String sql = """
-            SELECT f.*, u.username as follower_username 
-            FROM follower f 
-            JOIN user u ON f.followerId = u.id 
-            WHERE f.userId = ? 
+            SELECT
+                follower
+            FROM follower f
+            WHERE f.user = ?
             ORDER BY f.created_at DESC
-            """;
+        """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
+            stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
 
+
             while (rs.next()) {
-                followers.add(mapResultSetToFollower(rs));
+                followers.add(rs.getString("follower"));
             }
+
 
         } catch (SQLException e) {
             System.err.println("Erro ao buscar seguidores: " + e.getMessage());

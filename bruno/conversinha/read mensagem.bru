@@ -1,0 +1,16 @@
+meta {
+  name: read mensagem
+  type: http
+  seq: 12
+}
+
+get {
+  url: http://localhost:3030/api/messages/message/3
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

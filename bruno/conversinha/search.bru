@@ -1,0 +1,20 @@
+meta {
+  name: search
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3030/api/users/search?q=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
